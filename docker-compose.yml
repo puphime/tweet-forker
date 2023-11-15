@@ -1,17 +1,17 @@
 services:
-  app:
-    image: node:20-alpine
-    command: sh -c "npm ci && npm run build && node dist/server.js"
-    ports:
-      - 8080:80
-    working_dir: /app
+  forker:
+    image: forker
+    build: .
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - .env
+  scraper:
+    image: nitter-scraper
+    build: ../nitter-scraper
     deploy:
       restart_policy:
         condition: on-failure
     volumes:
-      - ./:/app
-      # Creates empty folder to prevent node_modules from being overwritten by volume
-      - /app/node_modules
-    environment:
-      PORT: 80
-      NODE_ENV: production
+      - /opt/nitter-scraper:/usr/src/app/db
